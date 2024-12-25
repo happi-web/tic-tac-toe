@@ -25,6 +25,13 @@ for (let i = 0; i < grid; i++) {
                     gameActive = false;  // Stop the game  // Announce the winner
                     return;
                 }
+
+                // Check for a draw
+                if (checkDraw(board)) {
+                    alert("It's a draw!");  // Announce the draw
+                    gameActive = false;  // Stop the game
+                    return;
+                }
                 currentPlayer = currentPlayer === "X" ? "O" : "X";
             }
             
@@ -32,6 +39,21 @@ for (let i = 0; i < grid; i++) {
         
     }
 }
+
+// Add a restart button functionality
+document.getElementById("restartButton").addEventListener("click", () => {
+    // Reset the board array
+    board = Array(grid).fill(null).map(() => Array(grid).fill(null));
+    
+    // Clear the gameboard UI
+    const squares = document.querySelectorAll(".gameboard div");
+    squares.forEach(square => square.textContent = "");
+
+    // Reset game state
+    currentPlayer = "X";
+    gameActive = true;
+});
+
 
 function checkWinner(board) {
     // Check rows
@@ -61,4 +83,15 @@ function checkWinner(board) {
 }
 
 
-
+// Draw checking function
+function checkDraw(board) {
+    // Check if all squares are filled
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
+            if (board[i][j] === null) {
+                return false; // Found an empty square, not a draw
+            }
+        }
+    }
+    return true; // All squares are filled
+}
