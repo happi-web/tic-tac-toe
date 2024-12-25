@@ -15,10 +15,30 @@ body
     background-color: #ffebcd;
     width: 100%;
 }
-.gameboard
-{
-    background-color: #885200;
-    width: 60%;
-    height: 100vh;
-    margin: 0 auto;
+/* Center the gameboard */
+.gameboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Ensures squares stay inside the board */
+    margin: auto;
+    width: 500px; /* Define the total gameboard width */
+    height: 500px; /* Define the total gameboard height */
+    border: 2px solid black; /* Optional: Add a border around the board */
+    background-color: lightgray; /* Optional: Add a background color */
+}
+
+/* Style each square */
+.gameboard div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px; /* Square width */
+    height: 150px; /* Square height */
+    border: 1px solid black; /* Add a border between squares */
+    box-sizing: border-box; /* Prevent padding/border from affecting size */
+    background-color: white; /* Square color */
+    font-size: 48px; /* Text size for X and O */
+    font-family: Arial, sans-serif; /* Font style */
+    cursor: pointer; /* Show pointer on hover */
 }

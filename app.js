@@ -13,8 +13,9 @@ let gameActive = true;
 for (let i = 0; i < grid; i++) {
     for (let j = 0; j < grid; j++) {    
         let innerDiv = document.createElement("div");
-        innerDiv.setAttribute("style", "display:inline-block;position:static; align-items:center; margin:15px; background-color:white; width: 150px; height:150px; align-items:center");
-        gameboard.appendChild(innerDiv);        
+        innerDiv.classList.add("square"); 
+        gameboard.appendChild(innerDiv); 
+              
         innerDiv.addEventListener("click", () => {
             if (gameActive && !innerDiv.textContent) {
                 innerDiv.textContent = currentPlayer;
