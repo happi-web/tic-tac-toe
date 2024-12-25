@@ -7,9 +7,37 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <h1>Tic Tac Toe Game</h1>
+  <p>Enjoy My Game</p>
+  <div class="player-display"></div>
+  <div>
+    <span class="score-display"></span>
+</div>
     <div class="gameboard">
     </div>
-    <button type="reset" id="restartButton">Restart</button>
+    <div class="player-setup">
+        <div class="players">
+            <label for="playerXName">Player 1</label>
+            <input type="text" id="playerXName" placeholder="Player 1">
+        </div>
+        <div class="players">
+            <label for="playerOName">Player 2</label>
+            <input type="text" id="playerOName" placeholder="Player 2">
+        </div>
+        <div class="mode">
+            <label for="gameMode">Game Mode:</label>
+            <select id="gameMode">
+                <option value="PvP">Player vs Player</option>
+                <option value="PvC">Player vs Computer</option>
+            </select>
+        </div>
+        <div class="btn">
+            <button id="startGame">Start Game</button>
+            <button id="restartButton">Restart</button>
+        </div>
+
+    </div>
+
     <script src="./app.js"></script>
 </body>
 </html>

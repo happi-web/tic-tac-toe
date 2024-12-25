@@ -1,98 +1,176 @@
-const gameboard = document.querySelector(".gameboard");
+document.addEventListener("DOMContentLoaded", () => {
+    const gameboard = document.querySelector(".gameboard");
+    const startButton = document.querySelector("#startGame");
+    const restartButton = document.querySelector("#restartButton");
+    const playerDisplay = document.querySelector(".player-display");
+    const scoreDisplay = document.querySelector(".score-display");
 
-//Computers Functions
-//Players Functions
-//Scores
-let grid = 3;
-let currentPlayer = "X";
-let board = Array(grid).fill(null).map(() => Array(grid).fill(null));
-let gameActive = true; 
+    const GRID = 3; // Grid size
+    let currentPlayer = "X";
+    let gameActive = true;
+    let gameMode;
+    let playerX, playerO;
+    let scores = { X: 0, O: 0 }; // Scoring system
 
-
-//Create a function to make squares on the gameboard
-for (let i = 0; i < grid; i++) {
-    for (let j = 0; j < grid; j++) {    
-        let innerDiv = document.createElement("div");
-        innerDiv.classList.add("square"); 
-        gameboard.appendChild(innerDiv); 
-              
-        innerDiv.addEventListener("click", () => {
-            if (gameActive && !innerDiv.textContent) {
-                innerDiv.textContent = currentPlayer;
-                board[i][j] = currentPlayer;
-                let winner = checkWinner(board);
-                if (winner) {
-                    alert(`Player ${winner} wins!`);
-                    gameActive = false;  // Stop the game  // Announce the winner
-                    return;
-                }
-
-                // Check for a draw
-                if (checkDraw(board)) {
-                    alert("It's a draw!");  // Announce the draw
-                    gameActive = false;  // Stop the game
-                    return;
-                }
-                currentPlayer = currentPlayer === "X" ? "O" : "X";
-            }
-            
-        })
-        
+    // Factory Function
+    function Player(name, symbol) {
+        return { name, symbol };
     }
-}
 
-// Add a restart button functionality
-document.getElementById("restartButton").addEventListener("click", () => {
-    // Reset the board array
-    board = Array(grid).fill(null).map(() => Array(grid).fill(null));
-    
-    // Clear the gameboard UI
-    const squares = document.querySelectorAll(".gameboard div");
-    squares.forEach(square => square.textContent = "");
+    // Start the game
+    startButton.addEventListener("click", startGame);
+    restartButton.addEventListener("click", resetGame);
 
-    // Reset game state
-    currentPlayer = "X";
-    gameActive = true;
+    function startGame() {
+        const playerXInput = document.querySelector("#playerXName").value;
+        const playerOInput = document.querySelector("#playerOName").value;
+        gameMode = document.querySelector("#gameMode").value;
+
+        if (!playerXInput || !playerOInput) {
+            alert("Enter the name of the players");
+            return;
+        }
+        playerX = Player(playerXInput, "X");
+        playerO = gameMode === "PvC" ? Player("Computer", "O") : Player(playerOInput, "O");
+
+        resetGame();
+        initializeBoard();
+        updateScores();
+    }
+
+    function initializeBoard() {
+        gameboard.innerHTML = "";
+        board = Array(GRID).fill(null).map(() => Array(GRID).fill(null));
+
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                const square = document.createElement("div");
+                square.classList.add("square");
+                square.addEventListener("click", () => handlePlayerMove(square, i, j));
+                gameboard.appendChild(square);
+            }
+        }
+        gameActive = true;
+        currentPlayer = "X";
+        updatePlayerDisplay();
+    }
+
+    function handlePlayerMove(square, row, col) {
+        if (!gameActive || square.textContent) {
+            return;
+        }
+
+        square.textContent = currentPlayer;
+        board[row][col] = currentPlayer;
+
+        if (checkWinner()) {
+            scores[currentPlayer]++;
+            alert(`${getCurrentPlayerName()} wins!`);
+            gameActive = false;
+            updateScores();
+            return;
+        }
+
+        if (checkDraw()) {
+            alert(`It's a draw!`);
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+        // If it's the computer's turn, make a move
+        if (gameMode === "PvC" && currentPlayer === "O") {
+            makeComputerMove();
+        }
+
+        updatePlayerDisplay();
+    }
+
+    function makeComputerMove() {
+        const emptySquares = [];
+        for (let i = 0; i < GRID; i++) {
+            for (let j = 0; j < GRID; j++) {
+                if (!board[i][j]) emptySquares.push({ row: i, col: j });
+            }
+        }
+
+        if (emptySquares.length === 0) return;
+
+        // Randomly select a square
+        const move = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+        const squareIndex = move.row * GRID + move.col;
+        const square = document.querySelectorAll(".square")[squareIndex];
+
+        square.textContent = currentPlayer;
+        board[move.row][move.col] = currentPlayer;
+
+        if (checkWinner()) {
+            scores[currentPlayer]++;
+            alert(`${getCurrentPlayerName()} wins!`);
+            gameActive = false;
+            updateScores();
+            return;
+        }
+
+        if (checkDraw()) {
+            alert(`It's a draw!`);
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = "X";
+        updatePlayerDisplay();
+    }
+
+    function updatePlayerDisplay() {
+        if (!playerDisplay) return;
+        playerDisplay.textContent = gameActive
+            ? `${getCurrentPlayerName()}'s turn (${currentPlayer})`
+            : "Game Over";
+    }
+
+    function updateScores() {
+        if (!scoreDisplay) return;
+        scoreDisplay.innerHTML = `Scores: ${playerX.name} (X)  [   ${scores.X}  ]  vs  ${playerO.name} (O)  [  ${scores.O}  ]`;
+    }
+
+    function getCurrentPlayerName() {
+        return currentPlayer === "X" ? playerX.name : playerO.name;
+    }
+
+    function checkWinner() {
+        const lines = [
+            // Rows
+            [[0, 0], [0, 1], [0, 2]],
+            [[1, 0], [1, 1], [1, 2]],
+            [[2, 0], [2, 1], [2, 2]],
+            // Columns
+            [[0, 0], [1, 0], [2, 0]],
+            [[0, 1], [1, 1], [2, 1]],
+            [[0, 2], [1, 2], [2, 2]],
+            // Diagonals
+            [[0, 0], [1, 1], [2, 2]],
+            [[0, 2], [1, 1], [2, 0]]
+        ];
+
+        for (const line of lines) {
+            const [a, b, c] = line;
+            if (board[a[0]][a[1]] && board[a[0]][a[1]] === board[b[0]][b[1]] && board[a[0]][a[1]] === board[c[0]][c[1]]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkDraw() {
+        return board.flat().every(cell => cell);
+    }
+
+    function resetGame() {
+        board = Array(GRID).fill(null).map(() => Array(GRID).fill(null));
+        gameActive = true;
+        currentPlayer = "X";
+        initializeBoard();
+    }
 });
-
-
-function checkWinner(board) {
-    // Check rows
-    for (let i = 0; i < board.length; i++) {
-        if (board[i][0] && board[i][0] === board[i][1] && board[i][1] === board[i][2]) {
-            return board[i][0]; // Return the winner ("X" or "O")
-        }
-    }
-
-    // Check columns
-    for (let j = 0; j < board.length; j++) {
-        if (board[0][j] && board[0][j] === board[1][j] && board[1][j] === board[2][j]) {
-            return board[0][j];
-        }
-    }
-
-    // Check diagonals
-    if (board[0][0] && board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
-        return board[0][0];
-    }
-    if (board[0][2] && board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
-        return board[0][2];
-    }
-
-    // No winner
-    return null;
-}
-
-
-// Draw checking function
-function checkDraw(board) {
-    // Check if all squares are filled
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            if (board[i][j] === null) {
-                return false; // Found an empty square, not a draw
-            }
-        }
-    }
-    return true; // All squares are filled
-}
