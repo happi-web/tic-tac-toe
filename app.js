@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const playerOInput = document.querySelector("#playerOName").value;
         gameMode = document.querySelector("#gameMode").value;
 
-        if (!playerXInput || !playerOInput) {
+        if (!playerXInput) {
             alert("Enter the name of the players");
             return;
         }
