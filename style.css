@@ -20,9 +20,11 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* 4 squares per row */
     gap: 5px; /* Space between squares */
-    width: 100%;
-    height: auto;
+    width: 90%;
+    height: 80vh;
     margin: 0 auto;
+    padding: 5px;
+    background-color: #131300;
 }
 
 .square {
@@ -165,7 +167,7 @@ select {
 
     .score-display {
         font-size: 1rem;
-        width: 30%;
+        width: 50%;
     }
 
     label {
