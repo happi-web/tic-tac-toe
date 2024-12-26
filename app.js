@@ -88,39 +88,79 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function makeComputerMove() {
-        const emptySquares = [];
-        for (let i = 0; i < GRID; i++) {
-            for (let j = 0; j < GRID; j++) {
-                if (!board[i][j]) emptySquares.push({ row: i, col: j });
+        // Function to check for a winning or blocking move
+        function findBestMove(symbol) {
+            for (const line of [
+                // Rows
+                [[0, 0], [0, 1], [0, 2]],
+                [[1, 0], [1, 1], [1, 2]],
+                [[2, 0], [2, 1], [2, 2]],
+                // Columns
+                [[0, 0], [1, 0], [2, 0]],
+                [[0, 1], [1, 1], [2, 1]],
+                [[0, 2], [1, 2], [2, 2]],
+                // Diagonals
+                [[0, 0], [1, 1], [2, 2]],
+                [[0, 2], [1, 1], [2, 0]]
+            ]) {
+                const [a, b, c] = line;
+                const values = [board[a[0]][a[1]], board[b[0]][b[1]], board[c[0]][c[1]]];
+                if (values.filter(v => v === symbol).length === 2 && values.includes(null)) {
+                    const emptyIndex = values.indexOf(null);
+                    return line[emptyIndex]; // Return the empty square
+                }
+            }
+            return null;
+        }
+
+        // Check for a winning move first
+        let bestMove = findBestMove("O");
+
+        // If no winning move, check for a blocking move
+        if (!bestMove) {
+            bestMove = findBestMove("X");
+        }
+
+        // If no blocking move, pick a random empty square
+        if (!bestMove) {
+            const emptySquares = [];
+            for (let i = 0; i < GRID; i++) {
+                for (let j = 0; j < GRID; j++) {
+                    if (!board[i][j]) emptySquares.push({ row: i, col: j });
+                }
+            }
+            if (emptySquares.length > 0) {
+                const randomMove = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+                bestMove = [randomMove.row, randomMove.col];
             }
         }
 
-        if (emptySquares.length === 0) return;
+        // Make the move
+        if (bestMove) {
+            const [row, col] = bestMove;
+            const squareIndex = row * GRID + col;
+            const square = document.querySelectorAll(".square")[squareIndex];
 
-        // Randomly select a square
-        const move = emptySquares[Math.floor(Math.random() * emptySquares.length)];
-        const squareIndex = move.row * GRID + move.col;
-        const square = document.querySelectorAll(".square")[squareIndex];
+            square.textContent = currentPlayer;
+            board[row][col] = currentPlayer;
 
-        square.textContent = currentPlayer;
-        board[move.row][move.col] = currentPlayer;
+            if (checkWinner()) {
+                scores[currentPlayer]++;
+                alert(`${getCurrentPlayerName()} wins!`);
+                gameActive = false;
+                updateScores();
+                return;
+            }
 
-        if (checkWinner()) {
-            scores[currentPlayer]++;
-            alert(`${getCurrentPlayerName()} wins!`);
-            gameActive = false;
-            updateScores();
-            return;
+            if (checkDraw()) {
+                alert(`It's a draw!`);
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = "X";
+            updatePlayerDisplay();
         }
-
-        if (checkDraw()) {
-            alert(`It's a draw!`);
-            gameActive = false;
-            return;
-        }
-
-        currentPlayer = "X";
-        updatePlayerDisplay();
     }
 
     function updatePlayerDisplay() {
