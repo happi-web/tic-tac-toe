@@ -133,7 +133,7 @@ select {
     justify-content: center;
     padding: 10px;
     margin: 10px auto;
-    width: 30%; /* Adjusted for smaller screens */
+    width: 50%; /* Adjusted for smaller screens */
     color: #ffffff;
     font-size: 1.2rem; /* Adjusted font size for better scaling */
     font-weight: bold;
