@@ -35,11 +35,16 @@ body {
     height: 20vh; /* Relative to viewport height */
     margin: 15px auto;
     font-size: 4rem;
+    cursor: grabbing;
     font-weight: bolder;
     background-color: white;
     border: 1px solid black;
 }
-
+.square:hover
+{
+    background-color: rgb(255, 123, 196);
+    color: #ffffff;
+}
 h1,
 p {
     text-align: center;
